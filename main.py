@@ -83,8 +83,8 @@ def control():
     data = request.get_json(force=True) or {}
     print(data)
     
-    l = max(-100, min(100, int(data.get("left", 0))))
-    r = max(-100, min(100, int(data.get("right", 0))))
+    l = max(-100, min(100, int(data.get("left", 0)))) * 0.2
+    r = max(-100, min(100, int(data.get("right", 0)))) * 0.2
 
     if r < 0:
        GPIO.output(r_fr,GPIO.LOW)
