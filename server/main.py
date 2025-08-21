@@ -14,7 +14,6 @@ def sendToInternals(channel: str, data):
         socketio.emit(channel, data, room=sid)
 
 
-
 # Hosts webapp
 @app.route("/")
 def index_file():
@@ -23,6 +22,7 @@ def index_file():
 @app.route('/<path:filename>')
 def access_webapp(filename):
     return send_from_directory("./rsc/webapp", filename)
+
 
 @socketio.on('connect')
 def on_connect():
@@ -37,19 +37,19 @@ def on_connect():
 def on_disconnect(_ = None):
     if request.sid in internal_clients:
         internal_clients.remove(request.sid)
+    else:
+        sendToInternals('ext_disconnect', {})
 
     print("Client disconnected: ",request.remote_addr)
 
 
-
-
 @socketio.on('joystick')
-def handle_message(data):
+def handle_message_joystick(data):
     # Echos data to internal devices
     sendToInternals('i_joystick', data)
 
 @socketio.on('emoji')
-def handle_message(data):
+def handle_message_emoji(data):
     # Echos data to internal devices
     sendToInternals('i_emoji', data)
 

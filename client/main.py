@@ -30,6 +30,10 @@ def disconnect():
     print("Disconnected from server")
     MovementController.setMovement(0,0, 0, 0)
 
+@sio.event
+def ext_disconnect(_):
+    print("External client disconnected")
+    MovementController.setMovement(0,0, 0, 0)
 
 # Function to send data periodically or continuously in a loop
 def main():

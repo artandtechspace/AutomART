@@ -6,6 +6,20 @@ const SERVER_ADDR = "AUTO";
 
 // #endregion
 
+const ANIMATIONS = {
+    'cry': '😭',
+    'heartEye': '😍',
+    'joy': '😂',
+    'mindblow': '🤯',
+    'scream': '😱',
+    'star': '🤩',
+    'tongue': '😝',
+    'imp-smile': '😈',
+    'melting': '🫠',
+    'party-face': '🥳',
+    'silently-happy': '🙂',
+    'star-struck': '🤩'
+}
 
 
 // Socket-IO-Server
@@ -64,11 +78,23 @@ function setupUI(){
         if(socket !== undefined) onJoyStick(angle, distance, leveledX, leveledY);
     });
 
-    // Adds listener
-    const btns = Array.from(document.querySelectorAll("input.emoji"));
+    // Gets the emoji bar
+    const bar = document.querySelector('#emoji-bar');
 
-    for(let btn of btns)
+    // Creates the buttons
+    for(let name in ANIMATIONS) {
+        let emoji = ANIMATIONS[name];
+
+        const btn = document.createElement("input");
+        btn.type = "button";
+        btn.classList.add("emoji");
+        btn.setAttribute('data-name', name);
+        btn.value = emoji;
+
         btn.addEventListener("click", onClickEmoji);
+
+        bar.appendChild(btn);
+    }
 
     uiElements = {
         status: document.querySelector("#status"),
