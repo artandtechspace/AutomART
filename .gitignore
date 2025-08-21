@@ -1,7 +1,1 @@
-._index.html
-._main.py
-._pwmtest.py
-._script.js
-._test.py
-.venv/
-__pycache__/
+venv/
