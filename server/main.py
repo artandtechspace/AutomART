@@ -1,6 +1,6 @@
-
 from flask import Flask, send_from_directory, redirect, request
 from flask_socketio import SocketIO, send
+import Config
 
 app = Flask(__name__)
 socketio = SocketIO(app, ping_interval=0.25, ping_timeout=1, async_mode='eventlet', cors_allowed_origins='*', transports=['websocket'])
@@ -56,4 +56,4 @@ def handle_message_emoji(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=80, debug=True)
+    socketio.run(app, host='0.0.0.0', port=Config.PORT, debug=True)

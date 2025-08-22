@@ -2,6 +2,7 @@ import socketio
 import MovementController
 import Display
 import time
+import Config
 
 # Create a Socket.IO client
 sio = socketio.Client()
@@ -43,7 +44,7 @@ def main():
     while True:
         try:
             # Connect to the Flask server
-            sio.connect('http://localhost:80', transports=['websocket'])
+            sio.connect(f'http://localhost:{Config.PORT}', transports=['websocket'])
 
             while True:
                 Display.loopDisplay()
