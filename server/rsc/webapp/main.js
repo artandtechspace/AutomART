@@ -28,9 +28,18 @@ let socket;
 // Object with references to all ui elements
 let uiElements;
 
-function onClickEmoji(evt) {
-    // Sends the event to the server
-    socket.emit("emoji", {type: evt.target.getAttribute("data-name")})
+// Sends the event to the server
+function onSelectEmoji(evt) {
+    const elm = event.target;
+
+    if(elm.selectedIndex == 0)
+        return;
+
+    const name = elm.value;
+
+    elm.selectedIndex = 0;
+
+    socket.emit("emoji", {type: name})
 }
 
 function onJoyStick(angle, dist, x, y) {
@@ -81,19 +90,18 @@ function setupUI(){
     // Gets the emoji bar
     const bar = document.querySelector('#emoji-bar');
 
+    const select = document.querySelector('#emoji-select');
+    select.addEventListener('change', onSelectEmoji);
+
     // Creates the buttons
     for(let name in ANIMATIONS) {
         let emoji = ANIMATIONS[name];
 
-        const btn = document.createElement("input");
-        btn.type = "button";
-        btn.classList.add("emoji");
-        btn.setAttribute('data-name', name);
-        btn.value = emoji;
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = emoji;
 
-        btn.addEventListener("click", onClickEmoji);
-
-        bar.appendChild(btn);
+        select.appendChild(opt);
     }
 
     uiElements = {
