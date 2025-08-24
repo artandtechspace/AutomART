@@ -3,7 +3,7 @@ from flask import Flask, send_from_directory, redirect, request
 from flask_socketio import SocketIO, send
 
 app = Flask(__name__)
-socketio = SocketIO(app, ping_interval=0.25, ping_timeout=1, async_mode='eventlet', cors_allowed_origins='*', transports=['websocket'])
+socketio = SocketIO(app, ping_interval=0.25, ping_timeout=3, async_mode='eventlet', cors_allowed_origins='*', transports=['websocket'])
 
 # Stores connected internal clients
 internal_clients = []

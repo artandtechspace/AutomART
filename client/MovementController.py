@@ -9,7 +9,7 @@ PIN_RIGHT_DIRECTION = 37
 PIN_LEFT_DIRECTION = 36
 
 
-SPEED_MODIFIER = 10 # 0 - 100
+SPEED_MODIFIER = 90 # 0 - 100
 
 
 
@@ -57,8 +57,8 @@ def calculate_x_y_from_angle_and_speed(angle, speed):
     l_rev = left < 0
     r_rev = right < 0
 
-    left = int(abs(left) * 50)
-    right = int(abs(right) * 50)
+    left = int(abs(left) * SPEED_MODIFIER)
+    right = int(abs(right) * SPEED_MODIFIER)
 
     return left, right, l_rev, r_rev
 
@@ -66,11 +66,26 @@ def calculate_x_y_from_angle_and_speed(angle, speed):
 def setMovement(angle: int, speed: int, x: int, y: int):
     global rightPWMAPI, leftPWMAPI
     
+    
+    if abs(angle) != 0:
+        # Calulates a modifier that scaled down the further to the side the angle is
+        modif = abs((abs(angle/math.pi)) - 0.5)
+
+        modif *= 0.6
+        modif += 0.4
+
+        speed *= modif
 
     if -math.pi/8 < angle < math.pi/8:
         angle = 0
 
+    if angle > math.pi -math.pi/8 or angle < -math.pi + math.pi/8:
+        angle = math.pi
+
     left, right, l_rev, r_rev = calculate_x_y_from_angle_and_speed(angle, speed)
+
+    if False:
+        return
 
     GPIO.output(PIN_LEFT_DIRECTION, GPIO.HIGH if r_rev == 1 else GPIO.LOW)
     GPIO.output(PIN_RIGHT_DIRECTION, GPIO.HIGH if l_rev == 0 else GPIO.LOW)
