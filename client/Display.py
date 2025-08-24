@@ -10,8 +10,6 @@ DEFAULT_ANIMATION = "grinning"
 
 
 
-
-
 # Directory where the animations are stored
 animatDir = 'client/animations/'+('color' if USE_COLOR else 'nocolor')
 
@@ -48,6 +46,14 @@ class Animation:
 currentAnimation: Animation = None
 currentFrame: int = 0
 nextFrameTime = -1
+
+def get_selected_animation():
+    '''
+    :return: name of the selected animation or None if the default is selected
+    '''
+    if currentAnimation.getName() == DEFAULT_ANIMATION:
+        return None
+    return currentAnimation.getName()
 
 def loadAnimation(anim: str):
     global currentAnimation, currentFrame
@@ -88,6 +94,5 @@ def loopDisplay():
 
         currentFrame = 0
 
-    currentAnimation.showFrame(currentFrame, True)
-
+    #currentAnimation.showFrame(currentFrame, True)
     pass

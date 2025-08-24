@@ -63,7 +63,7 @@ def calculate_x_y_from_angle_and_speed(angle, speed):
     return left, right, l_rev, r_rev
 
 # -100 to 100 to
-def setMovement(angle: int, speed: int, x: int, y: int):
+def setMovement(angle: int, speed: int):
     global rightPWMAPI, leftPWMAPI
     
 
