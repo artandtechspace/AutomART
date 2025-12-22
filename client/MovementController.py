@@ -1,5 +1,5 @@
 import math
-from apis.GPIOAPi import GPIO
+from client.apis.GPIOAPi import GPIO
 
 # Config
 PIN_RIGHT_SPEED = 32

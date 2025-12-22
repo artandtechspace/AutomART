@@ -1,10 +1,7 @@
 import socketio
-import MovementController
-import Display
+from client import Display, MovementController, Tank, Pump
 import time
 import Config
-import Tank
-import Pump
 
 # Create a Socket.IO client
 sio = socketio.Client()

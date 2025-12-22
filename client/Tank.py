@@ -1,4 +1,4 @@
-from apis.GPIOAPi import GPIO
+from client.apis.GPIOAPi import GPIO
 
 # Config
 PIN_TANK = 13

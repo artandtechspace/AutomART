@@ -1,4 +1,4 @@
-from apis.ServoBoardAPI import I2C, PCA9685, Servo
+from client.apis.ServoBoardAPI import I2C, PCA9685, Servo
 
 
 # Config
