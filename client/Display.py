@@ -66,7 +66,7 @@ def onSelectAnimation(anim: str = DEFAULT_ANIMATION):
     global currentAnimation, DEFAULT_ANIMATION, currentFrame, currentAnimation
 
     # Prevent if there is an animation playing
-    if currentAnimation != None and currentAnimation.getName() != DEFAULT_ANIMATION:
+    if currentAnimation is not None and currentAnimation.getName() != DEFAULT_ANIMATION:
         return
 
     # Prevent if new is not known
@@ -75,10 +75,15 @@ def onSelectAnimation(anim: str = DEFAULT_ANIMATION):
 
     loadAnimation(anim)
 
+# Returned value is send to frontend when status updates
+def collect_status():
+    return get_selected_animation()
+
+
 def setupDisplay():
     onSelectAnimation()
 
-def loopDisplay():
+def loopDisplay(notify_status):
     global nextFrameTime, currentFrame, currentAnimation, DEFAULT_ANIMATION
 
     # Wait for next frame
@@ -88,11 +93,16 @@ def loopDisplay():
 
     currentFrame += 1
     if currentFrame >= currentAnimation.getLength():
-
+        
+        # Resets the animation after it finishes
         if currentAnimation.getName() != DEFAULT_ANIMATION:
             loadAnimation(DEFAULT_ANIMATION)
 
+            # Sends back a state change
+            notify_status()
+            
         currentFrame = 0
 
-    #currentAnimation.showFrame(currentFrame, True)
+    # currentAnimation.showFrame(currentFrame, True)
+
     pass

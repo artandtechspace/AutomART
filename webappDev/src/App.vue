@@ -10,42 +10,78 @@
       </template>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="main">
       <!-- Control Joystick -->
       <Joystick class="joystick" @change="onJoyStick" />
 
+      <!-- Emoji overlay -->
       <template v-if="sockApi.isConnected.value">
         <!-- Playing emoji overlay -->
-        <div v-if="currentEmoji != null" class="position-absolute emoji-display">
-          {{ currentEmoji }}
+        <div v-if="displayEmoji != null" class="position-absolute emoji-display">
+          {{ displayEmoji }}
         </div>
         <!-- Menu to select emojis -->
         <EmojiMenu v-else @clicked="onEmojiClicked" />
       </template>
+
+      <!-- Pump and Tank overlay -->
+      <v-card
+        color="gray"
+        density="compact"
+        v-if="serverStatus !== null" 
+        class="position-absolute pump-display" title="Pump & Tank System" variant="outlined">
+        <v-card-actions>
+          <v-btn
+            prepend-icon="mdi-gas-station-outline"
+            :color="serverStatus.pump ? 'green' : 'red'"
+            variant="elevated"
+            @click="onPumpToggled"
+            >
+            Pump: {{ serverStatus.pump ? 'On' : 'Off' }}
+          </v-btn>
+          <v-btn
+          prepend-icon="mdi-tank"
+          :color="serverStatus.tank ? 'green' : 'red'"
+          variant="elevated"
+          @click="onTankToggled">
+            Tank: {{ serverStatus.tank ? 'Open' : 'Closed' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts" setup>
 import { useSocketio } from './directives/UseSocketio';
-import { EMOJIS } from './Conifg';
+import { EMOJIS } from './Config';
+import { RefSymbol } from '@vue/reactivity';
+import EmojiMenu from './components/EmojiMenu.vue';
+import Joystick from './components/Joystick.vue';
+import { server } from 'typescript';
 
-// Current emoji
-const currentEmoji: Ref<string | null> = ref(null);
+// Current status
+const serverStatus: Ref<{
+  emoji: string,
+  tank: boolean,
+  pump: boolean
+} | null> = ref(null)
+
+
+// Actual emoji that is shown
+const displayEmoji = computed(()=>{
+  if(
+    serverStatus.value === null || serverStatus.value.emoji === null ||
+    EMOJIS[serverStatus.value.emoji] === undefined
+  )
+    return null;
+
+  return EMOJIS[serverStatus.value.emoji];
+})
 
 // Socketio api
 const sockApi = useSocketio();
-sockApi.socket.on('e_status', onStatusRetreived);
-
-
-// Event: When a status update from the server is retreived
-function onStatusRetreived({ emoji }: { emoji: string | null }) {
-  // Updates emoji in ui
-  if (emoji == null || EMOJIS[emoji] === undefined)
-    currentEmoji.value = null;
-  else
-    currentEmoji.value = EMOJIS[emoji];
-}
+sockApi.socket.on('e_status', status => serverStatus.value = status);
 
 // Sends the joystick inputs to the server
 function onJoyStick(angle: number, distance: number) {
@@ -59,6 +95,16 @@ function onJoyStick(angle: number, distance: number) {
   sockApi.socket.emit("joystick", { angle, dist: distance / 200 });
 }
 
+// Event: When the pump button is pressed
+function onPumpToggled(){
+  sockApi.socket.emit('pump', { state: !serverStatus.value?.pump });
+}
+
+// Event: When the tank button is pressed
+function onTankToggled(){
+  sockApi.socket.emit('tank', { state: !serverStatus.value?.tank });
+}
+
 // Event: When an emoji is clicked
 function onEmojiClicked(name: string) {
   sockApi.socket.emit("emoji", { type: name });
@@ -67,12 +113,18 @@ function onEmojiClicked(name: string) {
 </script>
 
 <style lang="scss">
+
+.main {
+  background-image: url("/rsc/Background.png");
+  background-size: 100% 100%;
+}
+
 .joystick {
   display: block;
   width: 90%;
   height: 90%;
   margin: 5%;
-  background: rgb(215, 215, 215);
+  background: rgba(215, 215, 215, 0.527);
   border: 1vw dashed gray;
   border-radius: 1rem;
 }
@@ -80,6 +132,13 @@ function onEmojiClicked(name: string) {
 .status {
   padding: 5px 10px;
   border-radius: 99999px;
+}
+
+.pump-display {
+  user-select: none;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: white !important
 }
 
 // Shows currently playing emoji

@@ -1,7 +1,7 @@
 import { onMounted } from 'vue'
 import { io, Socket } from "socket.io-client";
 import { type Ref, ref } from "vue"
-import { ADRESS } from '../Conifg'
+import { ADDRESS } from '../Config'
 
 
 
@@ -21,13 +21,13 @@ export function useSocketio() : SocketAPI {
 
     console.log("[Socket] Init socket");
 
-    // Gets the adress
-    let addr = ADRESS;
+    // Gets the address
+    let addr = ADDRESS;
     if(addr === 'AUTO')
         addr = location.host;
 
     const socket = io(`http://${addr}/`, {
-        transports: ['websocket']
+        transports: ['websocket'],
     });
 
     const refConnected: Ref<boolean> = ref(false);

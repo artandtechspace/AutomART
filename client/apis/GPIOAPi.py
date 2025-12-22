@@ -1,6 +1,8 @@
 try:
     import RPi.GPIO as GPIO
 except:
+    print("[WARNING] Using emulator for GPIO because the real library can't be found.")
+
     class DummyPWM:
 
         def __init__(self, name = "unnamed"):

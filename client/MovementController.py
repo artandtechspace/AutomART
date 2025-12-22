@@ -1,5 +1,5 @@
 import math
-from GPIOAPi import GPIO
+from apis.GPIOAPi import GPIO
 
 # Config
 PIN_RIGHT_SPEED = 32
@@ -18,28 +18,8 @@ SPEED_MODIFIER = 90 # 0 - 100
 rightPWMAPI = None
 leftPWMAPI = None
 
-def setupMovement():
-    global rightPWMAPI, leftPWMAPI
-    print("GPIO", GPIO)
-    # Setup board
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
 
-    # Configures the PWM-Pins
-    GPIO.setup(PIN_RIGHT_SPEED, GPIO.OUT)
-    rightPWMAPI = GPIO.PWM(PIN_RIGHT_SPEED, 1000)
-    rightPWMAPI.start(0)
-
-    GPIO.setup(PIN_LEFT_SPEED, GPIO.OUT)
-    leftPWMAPI = GPIO.PWM(PIN_LEFT_SPEED, 1000)
-    leftPWMAPI.start(0)
-
-    # Configures direction Pins
-    GPIO.setup(PIN_LEFT_DIRECTION, GPIO.OUT)
-    GPIO.setup(PIN_RIGHT_DIRECTION, GPIO.OUT)
-
-
-def calculate_x_y_from_angle_and_speed(angle, speed):
+def __calculate_x_y_from_angle_and_speed(angle, speed):
     nY = speed * math.sin(angle)
 
     if nY < 0:
@@ -62,6 +42,29 @@ def calculate_x_y_from_angle_and_speed(angle, speed):
 
     return left, right, l_rev, r_rev
 
+
+# region: External access
+
+def setupMovement():
+    global rightPWMAPI, leftPWMAPI
+    
+    # Setup board
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BOARD)
+
+    # Configures the PWM-Pins
+    GPIO.setup(PIN_RIGHT_SPEED, GPIO.OUT)
+    rightPWMAPI = GPIO.PWM(PIN_RIGHT_SPEED, 1000)
+    rightPWMAPI.start(0)
+
+    GPIO.setup(PIN_LEFT_SPEED, GPIO.OUT)
+    leftPWMAPI = GPIO.PWM(PIN_LEFT_SPEED, 1000)
+    leftPWMAPI.start(0)
+
+    # Configures direction Pins
+    GPIO.setup(PIN_LEFT_DIRECTION, GPIO.OUT)
+    GPIO.setup(PIN_RIGHT_DIRECTION, GPIO.OUT)
+
 # -100 to 100 to
 def setMovement(angle: int, speed: int):
     global rightPWMAPI, leftPWMAPI
@@ -82,7 +85,7 @@ def setMovement(angle: int, speed: int):
     if angle > math.pi -math.pi/8 or angle < -math.pi + math.pi/8:
         angle = math.pi
 
-    left, right, l_rev, r_rev = calculate_x_y_from_angle_and_speed(angle, speed)
+    left, right, l_rev, r_rev = __calculate_x_y_from_angle_and_speed(angle, speed)
 
     if False:
         return
@@ -99,3 +102,5 @@ def setMovement(angle: int, speed: int):
 
 def loopMovement():
     pass
+
+# endregion

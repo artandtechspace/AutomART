@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { EMOJIS } from '@/Conifg';
+import { EMOJIS } from '@/Config';
 
 const emit = defineEmits<{
     (e: 'clicked', emoji: string): void
