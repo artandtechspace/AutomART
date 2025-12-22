@@ -22,6 +22,7 @@ except:
         HIGH = 1
         OUT = 2
         BOARD = 10
+        BCM = 11
 
         @staticmethod
         def setwarnings(mode):

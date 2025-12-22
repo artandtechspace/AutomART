@@ -2,6 +2,7 @@ import socketio
 from client import Display, MovementController, Tank, Pump
 import time
 import Config
+from client.apis.GPIOAPi import GPIO
 
 # Create a Socket.IO client
 sio = socketio.Client()
@@ -84,6 +85,8 @@ def notify_status(force: bool = True):
 # Function to send data periodically or continuously in a loop
 def main():
     global nextStatusAt
+
+    GPIO.setmode(GPIO.BCM)
 
     Display.setupDisplay()
     MovementController.setupMovement()

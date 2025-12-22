@@ -2,11 +2,11 @@ import math
 from client.apis.GPIOAPi import GPIO
 
 # Config
-PIN_RIGHT_SPEED = 32
-PIN_LEFT_SPEED = 33
+PIN_RIGHT_SPEED = 12
+PIN_LEFT_SPEED = 13
 
-PIN_RIGHT_DIRECTION = 37
-PIN_LEFT_DIRECTION = 36
+PIN_RIGHT_DIRECTION = 26
+PIN_LEFT_DIRECTION = 16
 
 
 SPEED_MODIFIER = 90 # 0 - 100
@@ -50,7 +50,6 @@ def setupMovement():
     
     # Setup board
     GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
 
     # Configures the PWM-Pins
     GPIO.setup(PIN_RIGHT_SPEED, GPIO.OUT)

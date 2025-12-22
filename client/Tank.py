@@ -1,7 +1,7 @@
 from client.apis.GPIOAPi import GPIO
 
 # Config
-PIN_TANK = 13
+PIN_TANK = 27
 
 # Variables
 state: bool = False
