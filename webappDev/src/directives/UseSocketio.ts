@@ -1,7 +1,6 @@
-import { onMounted } from 'vue'
 import { io, Socket } from "socket.io-client";
 import { type Ref, ref } from "vue"
-import { ADDRESS } from '../Config'
+import { DBG_PORT } from '../Config'
 
 
 
@@ -22,9 +21,9 @@ export function useSocketio() : SocketAPI {
     console.log("[Socket] Init socket");
 
     // Gets the address
-    let addr = ADDRESS;
-    if(addr === 'AUTO')
-        addr = location.host;
+    let addr = location.host;
+    if(location.hostname === 'localhost')
+        addr = location.hostname + ":" + DBG_PORT;
 
     const socket = io(`http://${addr}/`, {
         transports: ['websocket'],

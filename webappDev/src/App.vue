@@ -2,12 +2,16 @@
   <v-app>
     <v-main class="main">
 
+      <v-overlay v-model="speedMenuOpen" class="align-center justify-center">
+          <SpeedOverlay v-model="speedModifier"/>
+      </v-overlay>
+
       <div class="grid-main">
         <div class="grid-item grid-left">
           <Joystick @change="n=>onJoyStick(true,n)" class="joystick" />
         </div>
         <div class="grid-item grid-center">
-          <MiddleMenu :state="serverStatus" />
+          <MiddleMenu @status-clicked="()=>speedMenuOpen = true" :state="serverStatus" />
         </div>
         <div class="grid-item grid-right">
           <Joystick @change="n=>onJoyStick(false,n)" class="joystick" />
@@ -23,6 +27,7 @@ import { useSocketio } from './directives/UseSocketio';
 import Joystick from './components/Joystick.vue';
 import MiddleMenu from './components/MiddleMenu.vue';
 import { type ServerState } from "./Server"
+import SpeedOverlay from './components/SpeedOverlay.vue';
 
 // Current status
 const serverStatus: Ref<ServerState | null> = ref(null)
@@ -40,6 +45,9 @@ const sockApi = useSocketio();
 sockApi.socket.on('e_status', status => serverStatus.value = status);
 
 
+// Speed modifier
+const speedModifier = ref(20);
+const speedMenuOpen = ref(false);
 
 function onJoyStick(isRight: boolean, y: number) {
     if(isRight)
@@ -49,7 +57,8 @@ function onJoyStick(isRight: boolean, y: number) {
 
   // Sends the data
   sockApi.socket.emit("joystick_tank", {
-    l: joyStickPositions.value.l, r: joyStickPositions.value.r
+    l: joyStickPositions.value.l * speedModifier.value/100,
+    r: joyStickPositions.value.r * speedModifier.value/100
   });
 }
 
