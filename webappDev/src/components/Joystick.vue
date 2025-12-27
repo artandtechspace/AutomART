@@ -7,10 +7,8 @@
 import JoystickController from "joystick-controller";
 import { ref } from "vue";
 
-//const props = defineProps<{}>()
-
 const emit = defineEmits<{
-    (e: 'change', angle: number, speed: number): void
+    (e: 'change', y: number): void
 }>()
 
 let joystick: JoystickController | undefined = undefined;
@@ -18,7 +16,6 @@ let joystick: JoystickController | undefined = undefined;
 const refElm = ref(null);
 
 onMounted(()=>{
-
     joystick = new JoystickController({
         maxRange: 200,
         level: 100,
@@ -30,7 +27,9 @@ onMounted(()=>{
         dynamicPositionTarget: refElm.value,
         mouseClickButton: "ALL",
         hideContextMenu: true,
-    }, (data) => emit('change', data.angle, data.distance));
+    }, (data) => {
+        emit('change', data.leveledY)
+    });
 })
 
 onUnmounted(()=> {

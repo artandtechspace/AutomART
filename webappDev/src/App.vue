@@ -1,122 +1,86 @@
 <template>
   <v-app>
-    <v-app-bar color="primary">
-      <v-app-bar-title>Rieke's AutomART</v-app-bar-title>
-
-      <template v-slot:append>
-        <span :class="'status ' + (sockApi.isConnected.value ? 'bg-green' : 'bg-red')">
-          {{ sockApi.isConnected.value ? 'Connected' : 'Reconnecting' }}
-        </span>
-      </template>
-    </v-app-bar>
-
     <v-main class="main">
-      <!-- Control Joystick -->
-      <Joystick class="joystick" @change="onJoyStick" />
 
-      <!-- Emoji overlay -->
-      <template v-if="sockApi.isConnected.value">
-        <!-- Playing emoji overlay -->
-        <div v-if="displayEmoji != null" class="position-absolute emoji-display">
-          {{ displayEmoji }}
+      <div class="grid-main">
+        <div class="grid-item grid-left">
+          <Joystick @change="n=>onJoyStick(true,n)" class="joystick" />
         </div>
-        <!-- Menu to select emojis -->
-        <EmojiMenu v-else @clicked="onEmojiClicked" />
-      </template>
+        <div class="grid-item grid-center">
+          <MiddleMenu :state="serverStatus" />
+        </div>
+        <div class="grid-item grid-right">
+          <Joystick @change="n=>onJoyStick(false,n)" class="joystick" />
+        </div>
+      </div>
 
-      <!-- Pump and Tank overlay -->
-      <v-card
-        color="gray"
-        density="compact"
-        v-if="serverStatus !== null" 
-        class="position-absolute pump-display" title="Pump & Tank System" variant="outlined">
-        <v-card-actions>
-          <v-btn
-            prepend-icon="mdi-gas-station-outline"
-            :color="serverStatus.pump ? 'green' : 'red'"
-            variant="elevated"
-            @click="onPumpToggled"
-            >
-            Pump: {{ serverStatus.pump ? 'On' : 'Off' }}
-          </v-btn>
-          <v-btn
-          prepend-icon="mdi-tank"
-          :color="serverStatus.tank ? 'green' : 'red'"
-          variant="elevated"
-          @click="onTankToggled">
-            Tank: {{ serverStatus.tank ? 'Open' : 'Closed' }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts" setup>
 import { useSocketio } from './directives/UseSocketio';
-import { EMOJIS } from './Config';
-import { RefSymbol } from '@vue/reactivity';
-import EmojiMenu from './components/EmojiMenu.vue';
 import Joystick from './components/Joystick.vue';
-import { server } from 'typescript';
+import MiddleMenu from './components/MiddleMenu.vue';
+import { type ServerState } from "./Server"
 
 // Current status
-const serverStatus: Ref<{
-  emoji: string,
-  tank: boolean,
-  pump: boolean
-} | null> = ref(null)
+const serverStatus: Ref<ServerState | null> = ref(null)
 
-
-// Actual emoji that is shown
-const displayEmoji = computed(()=>{
-  if(
-    serverStatus.value === null || serverStatus.value.emoji === null ||
-    EMOJIS[serverStatus.value.emoji] === undefined
-  )
-    return null;
-
-  return EMOJIS[serverStatus.value.emoji];
+const joyStickPositions: Ref<{
+  r: number,
+  l: number
+}> = ref({
+  r: 0,
+  l: 0
 })
 
 // Socketio api
 const sockApi = useSocketio();
 sockApi.socket.on('e_status', status => serverStatus.value = status);
 
-// Sends the joystick inputs to the server
-function onJoyStick(angle: number, distance: number) {
-  if (distance > 200) distance = 200;
 
-  angle += Math.PI / 2
-  if (angle > Math.PI)
-    angle -= 2 * Math.PI
+
+function onJoyStick(isRight: boolean, y: number) {
+    if(isRight)
+      joyStickPositions.value.r = y;
+    else
+      joyStickPositions.value.l = y;
 
   // Sends the data
-  sockApi.socket.emit("joystick", { angle, dist: distance / 200 });
-}
-
-// Event: When the pump button is pressed
-function onPumpToggled(){
-  sockApi.socket.emit('pump', { state: !serverStatus.value?.pump });
-}
-
-// Event: When the tank button is pressed
-function onTankToggled(){
-  sockApi.socket.emit('tank', { state: !serverStatus.value?.tank });
-}
-
-// Event: When an emoji is clicked
-function onEmojiClicked(name: string) {
-  sockApi.socket.emit("emoji", { type: name });
+  sockApi.socket.emit("joystick_tank", {
+    l: joyStickPositions.value.l, r: joyStickPositions.value.r
+  });
 }
 
 </script>
 
 <style lang="scss">
+:root {
+  --general-padding: 10px;
+}
 
 .main {
   background-image: url("/rsc/Background.png");
   background-size: 100% 100%;
+}
+
+.grid-main {
+  display: flex;
+  height: 100%;
+}
+
+.grid-left,
+.grid-right {
+  flex-grow: 1;
+}
+
+.grid-center {
+  padding: var(--general-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--general-padding);
+  min-width: 30vw;
 }
 
 .joystick {
@@ -125,59 +89,7 @@ function onEmojiClicked(name: string) {
   height: 90%;
   margin: 5%;
   background: rgba(215, 215, 215, 0.527);
-  border: 1vw dashed gray;
+  border: 4px dotted gray;
   border-radius: 1rem;
-}
-
-.status {
-  padding: 5px 10px;
-  border-radius: 99999px;
-}
-
-.pump-display {
-  user-select: none;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  background: white !important
-}
-
-// Shows currently playing emoji
-.emoji-display {
-  user-select: none;
-  bottom: 1.5rem;
-  right: 1.5rem;
-
-  background-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  padding: 1rem;
-  font-size: 400%;
-
-  animation: softBounce 1.5s ease-out infinite;
-}
-
-.settings-menu-background {
-
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-@keyframes softBounce {
-  0% {
-    transform: translateY(0);
-  }
-
-  10% {
-    transform: translateY(-10px);
-  }
-
-  40% {
-    transform: translateY(-0px);
-  }
-
-  100% {
-    transform: translateY(0);
-  }
 }
 </style>
