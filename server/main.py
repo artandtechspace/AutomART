@@ -61,6 +61,11 @@ def handle_message_joystick(data):
     # Echos data to internal devices
     sendToInternals('i_joystick', data)
 
+@socketio.on('joystick_tank')
+def handle_message_joystick_tank(data):
+    # Echos data to internal devices
+    sendToInternals('i_joystick_tank', data)
+
 @socketio.on('tank')
 def handle_message_tank(data):
     # Echos data to internal devices

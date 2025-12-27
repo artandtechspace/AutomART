@@ -97,6 +97,20 @@ def setMovement(angle: int, speed: int):
 
     pass
 
+# right, left: -100 to 100
+def setMovementTank(right: int, left: int):
+    r_rev = right < 0
+    l_rev = left < 0
+
+    right = abs(right)
+    left = abs(left)
+
+
+    GPIO.output(PIN_LEFT_DIRECTION, GPIO.HIGH if r_rev == 1 else GPIO.LOW)
+    GPIO.output(PIN_RIGHT_DIRECTION, GPIO.HIGH if l_rev == 0 else GPIO.LOW)
+
+    rightPWMAPI.ChangeDutyCycle(int(left))
+    leftPWMAPI.ChangeDutyCycle(int(right))
 
 
 def loopMovement():

@@ -5,8 +5,8 @@ from client.apis.ServoBoardAPI import I2C, PCA9685, Servo
 PCA_FREQUENCY = 50
 PCA_I2C_ADDRESS = 65
 
-TANK_ON_ANGLE = 0
-TANK_OFF_ANGLE = 180
+TANK_ON_ANGLE = 20
+TANK_OFF_ANGLE = 120
 
 
 # Values to access the Servo (API)

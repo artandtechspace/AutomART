@@ -41,6 +41,10 @@ def i_joystick(data):
     MovementController.setMovement(data['angle'], data['dist'])
 
 @sio.event
+def i_joystick_tank(data):
+    MovementController.setMovementTank(data['r'], data['l'])
+
+@sio.event
 def i_emoji(data):
     emoji_type = data['type']
     Display.onSelectAnimation(emoji_type)
