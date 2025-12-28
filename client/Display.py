@@ -103,6 +103,6 @@ def loopDisplay(notify_status):
             
         currentFrame = 0
 
-    # currentAnimation.showFrame(currentFrame, True)
+    currentAnimation.showFrame(currentFrame, True)
 
     pass
